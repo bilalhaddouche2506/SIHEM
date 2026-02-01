@@ -1,4 +1,4 @@
-# SIHEM
+SIHEM
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -66,6 +66,12 @@
 <body>
   <canvas id="confetti"></canvas>
 
+  <!-- 🎶 Mets le fichier MP3 dans le même dossier/repo que index.html -->
+  <!-- Nom conseillé : nour-el-ein.mp3 -->
+  <audio id="music" preload="auto">
+    <source src="nour-el-ein.mp3" type="audio/mpeg">
+  </audio>
+
   <div class="card">
     <h1>Sihem… veux-tu être ma Valentine ? 💘</h1>
     <p>Ma Princesse, je s'occupe de tout tu s'occupe de rien 😉😌</p>
@@ -106,9 +112,11 @@
     noBtn.addEventListener("mouseenter", moveNo);
     noBtn.addEventListener("touchstart", (e)=>{ e.preventDefault(); moveNo(); }, {passive:false});
 
-    // Confettis + overlay
+    // Confettis + overlay + musique
     const yesBtn = document.getElementById("yes");
     const overlay = document.getElementById("overlay");
+    const music = document.getElementById("music");
+
     const canvas = document.getElementById("confetti");
     const ctx = canvas.getContext("2d");
     function resize(){ canvas.width = innerWidth; canvas.height = innerHeight; }
@@ -131,15 +139,29 @@
       animId = requestAnimationFrame(animate);
     }
 
-    yesBtn.addEventListener("click", ()=>{
+    yesBtn.addEventListener("click", async ()=>{
       overlay.classList.add("show");
+
+      // 🎶 Démarre la musique au clic (compatible iPhone)
+      try{
+        music.currentTime = 0;   // repart du début
+        await music.play();
+      }catch(e){
+        // Si Safari bloque (rare ici), la page marche quand même
+        console.log("Lecture audio bloquée:", e);
+      }
+
       spawn();
       cancelAnimationFrame(animId);
       animate();
     });
 
+    // Fermer l'overlay en cliquant dehors + arrêter la musique
     overlay.addEventListener("click", (e)=>{
-      if(e.target === overlay) overlay.classList.remove("show");
+      if(e.target === overlay){
+        overlay.classList.remove("show");
+        music.pause();
+      }
     });
   </script>
 </body>
